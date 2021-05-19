@@ -1,0 +1,17 @@
+.flip {
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+}
+.forecast-card {
+  cursor: pointer;
+  transition: all 100ms;
+  text-decoration: none !important;
+  color: #333;
+}
+
+.forecast-card:hover div:first-child {
+  background-color: #e9ecef;
+  border: 1px solid transparent !important;
+}
