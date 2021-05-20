@@ -1,15 +1,15 @@
 import React from "react";
 import { IoLogoRss } from "react-icons/io";
 import { Link } from "react-router-dom";
-const ForecastCard = (props) => {
+const ForecastCard = ({ cityName, date }) => {
   return (
     <Link
-      to="/forecast"
+      to={`/forecast/${cityName}`}
       className="forecast-card  col col-lg-4 col-md-6 col-sm-12 col-12 my-3"
     >
       <div className="p-2 border rounded shadow-sm">
-        <h4>City name</h4>
-        <p className="text-muted">Checked on DD-MM-YYYY HH-mm</p>
+        <h4>{cityName}</h4>
+        <p className="text-muted">{date}</p>
         <div className="d-flex justify-content-end">
           <IoLogoRss className="flip text-muted" />
         </div>

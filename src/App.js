@@ -8,6 +8,7 @@ function App() {
   return (
     <BrowserRouter>
       <Switch>
+        <Route path="/forecast/:city" component={Forecast} />
         <Route path="/forecast" component={Forecast} />
         <Route path="/" component={Home} />
       </Switch>
