@@ -5,6 +5,52 @@ import ForecastCard from "../components/ForecastCard";
 import Switch from "../components/Switch";
 import { useSelector, useDispatch } from "react-redux";
 import { addToList } from "../actions/weatherActions";
+import Table from "../components/Table";
+import { Bar } from "react-chartjs-2";
+
+const days = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+];
+
+let data1 = {
+  labels: [],
+  datasets: [],
+};
+
+for (var i = new Date().getDay() - 1; i < new Date().getDay() - 1 + 8; i++) {
+  data1.labels.push(days[i]);
+}
+
+const options = {
+  scales: {
+    yAxes: [
+      {
+        stacked: true,
+        ticks: {
+          beginAtZero: true,
+        },
+      },
+    ],
+    xAxes: [
+      {
+        stacked: true,
+      },
+    ],
+  },
+};
 
 const Forecast = ({ match }) => {
   const dispatch = useDispatch();
@@ -12,6 +58,8 @@ const Forecast = ({ match }) => {
   const [weather, setWeather] = useState({ main: {}, wind: {} });
   const [forecast, setForecast] = useState({ main: {}, wind: {} });
   const [time, setTime] = useState({});
+  const [isTable, setIsTable] = useState(true);
+
   const { toggled } = useSelector((state) => state.toggleList);
   const weatherList = useSelector((state) => state.weatherList);
 
@@ -20,13 +68,7 @@ const Forecast = ({ match }) => {
 
   const getCurrentWeather = async () => {
     const { data } = await axios.get(api);
-    // const data = {
-    //   name: "Test",
-    //   lon: 20,
-    //   lat: 100,
-    //   main: { temp: 18, humidity: 200 },
-    //   wind: { speed: 200 },
-    // };
+
     setWeather(data);
 
     console.log(data);
@@ -43,21 +85,53 @@ const Forecast = ({ match }) => {
     };
     setTime(time);
     const stringTime = printDate(time);
-    // dispatch(addToList({ data, stringTime }));
+    dispatch(addToList({ data, stringTime }));
   };
 
-  // const getForecast = async () => {
-  //   var { data: forecastData } = await axios.get(
-  //     `https://api.openweathermap.org/data/2.5/onecall?lat=${weather.lat}&lon=${weather.lon}&exclude=minutely,hourly&units=metric&appid=45a91daba21050d4bdf6dd758924e776`
-  //   );
-  //   setWeather(forecastData);
-  // };
+  const getForecast = async () => {
+    var { data: forecastData } = await axios.get(
+      `https://api.openweathermap.org/data/2.5/onecall?lat=${weather.coord.lat}&lon=${weather.coord.lon}&exclude=minutely,hourly&units=metric&appid=45a91daba21050d4bdf6dd758924e776`
+    );
+    setForecast(forecastData);
+    const dataset = [
+      {
+        label: "Min",
+        data: [],
+        backgroundColor: "rgb(255, 99, 132)",
+      },
+      {
+        label: "Max",
+        data: [],
+        backgroundColor: "rgb(54, 162, 235)",
+      },
+      {
+        label: "Humidity",
+        data: [],
+        backgroundColor: "rgb(75, 192, 192)",
+      },
+      {
+        label: "Wind Speed",
+        data: [],
+        backgroundColor: "rgb(202, 202, 12)",
+      },
+    ];
+    forecastData.daily.forEach((element) => {
+      dataset[0].data.push(element.temp.min);
+      dataset[1].data.push(element.temp.max);
+      dataset[2].data.push(element.humidity);
+      dataset[3].data.push(element.wind_speed);
+    });
+    data1.datasets = dataset;
+    // console.log(forecastData);
+  };
 
   useEffect(() => {
-    getCurrentWeather();
-    if (weather.lat && weather.lon)
-      console.log(`Lat ${weather.lat} & Lon ${weather.lon}`);
-  }, [dispatch]);
+    // if (weather.name != city) getCurrentWeather();
+    if (!weather.name) getCurrentWeather();
+    else {
+      getForecast();
+    }
+  }, [dispatch, weather.coord, city]);
 
   const printDate = (date) => {
     return `${date.day < 9 ? "0" : ""}${date.day}-${date.month < 9 ? "0" : ""}${
@@ -95,8 +169,7 @@ const Forecast = ({ match }) => {
               type="radio"
               name="options"
               autoComplete="off"
-              checked={true}
-              onChange={() => console.log("Change to chart")}
+              onClick={() => setIsTable(false)}
             />
             Chart
           </label>
@@ -106,7 +179,8 @@ const Forecast = ({ match }) => {
               type="radio"
               name="options"
               autoComplete="off"
-              onChange={() => console.log("Change to table")}
+              checked={true}
+              onClick={() => setIsTable(true)}
             />
             Table
           </label>
@@ -114,13 +188,18 @@ const Forecast = ({ match }) => {
       </div>
 
       {/* Chart */}
-      <div className="card mb-5">
-        <div className="card-body">
-          <div className="chart">
-            <canvas id="chart-bars" className="chart-canvas"></canvas>
+
+      {isTable ? (
+        <Table data={forecast.daily} />
+      ) : (
+        <div className="card mb-5">
+          <div className="card-body">
+            <div className="chart">
+              <Bar data={data1} width={100} height={50} options={options} />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="text-center mb-5">
         <Link to="/" className="btn btn-lg btn-primary">
