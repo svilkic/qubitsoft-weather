@@ -1,10 +1,10 @@
 import React from "react";
 import { IoLogoRss } from "react-icons/io";
 import { Link } from "react-router-dom";
-const ForecastCard = ({ cityName, date }) => {
+const ForecastCard = ({ cityName, cityId, date }) => {
   return (
     <Link
-      to={`/forecast/${cityName}`}
+      to={`/forecast/${cityId}`}
       className="forecast-card  col col-lg-4 col-md-6 col-sm-12 col-12 my-3"
     >
       <div className="p-2 border rounded shadow-sm">

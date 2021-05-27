@@ -33,6 +33,17 @@ const Table = ({ data }) => {
       </thead>
       <tbody>
         <tr>
+          <td></td>
+          {data &&
+            data.map((day) => (
+              <td>
+                <img
+                  src={`http://openweathermap.org/img/wn/${day.weather[0].icon}.png`}
+                />
+              </td>
+            ))}
+        </tr>
+        <tr>
           <td>Min</td>
           {data && data.map((day) => <td>{day.temp.min}</td>)}
         </tr>

@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import ForecastCard from "../components/ForecastCard";
-import Switch from "../components/Switch";
 import { useSelector, useDispatch } from "react-redux";
 import { addToList } from "../actions/weatherActions";
 import Table from "../components/Table";
 import { Bar } from "react-chartjs-2";
+import PreviousSearch from "../components/PreviousSearch";
 
 const days = [
   "monday",
@@ -25,13 +24,13 @@ const days = [
   "sunday",
 ];
 
-let data1 = {
+let chartData = {
   labels: [],
   datasets: [],
 };
 
 for (var i = new Date().getDay() - 1; i < new Date().getDay() - 1 + 8; i++) {
-  data1.labels.push(days[i]);
+  chartData.labels.push(days[i]);
 }
 
 const options = {
@@ -64,27 +63,25 @@ const Forecast = ({ match }) => {
   const weatherList = useSelector((state) => state.weatherList);
 
   const city = match.params.city;
-  const api = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=45a91daba21050d4bdf6dd758924e776`;
+  const api = `https://api.openweathermap.org/data/2.5/weather?id=${city}&units=metric&appid=45a91daba21050d4bdf6dd758924e776`;
 
   const getCurrentWeather = async () => {
     const { data } = await axios.get(api);
 
     setWeather(data);
 
-    console.log(data);
-
     const date = new Date();
 
     const time = {
       year: date.getFullYear(),
-      month: date.getMonth(),
-      day: date.getDay(),
+      month: date.getMonth() + 1,
+      day: date.getDate(),
       hours: date.getHours(),
       minutes: date.getMinutes(),
       seconds: date.getSeconds(),
     };
     setTime(time);
-    const stringTime = printDate(time);
+    const stringTime = formateDate(time);
     dispatch(addToList({ data, stringTime }));
   };
 
@@ -121,19 +118,19 @@ const Forecast = ({ match }) => {
       dataset[2].data.push(element.humidity);
       dataset[3].data.push(element.wind_speed);
     });
-    data1.datasets = dataset;
-    // console.log(forecastData);
+    chartData.datasets = dataset;
+    console.log(forecastData);
   };
 
   useEffect(() => {
-    // if (weather.name != city) getCurrentWeather();
+    if (weather.id != city) getCurrentWeather();
     if (!weather.name) getCurrentWeather();
     else {
       getForecast();
     }
   }, [dispatch, weather.coord, city]);
 
-  const printDate = (date) => {
+  const formateDate = (date) => {
     return `${date.day < 9 ? "0" : ""}${date.day}-${date.month < 9 ? "0" : ""}${
       date.month
     }-${date.year} ${date.hours < 9 ? "0" : ""}${date.hours}:${
@@ -147,7 +144,7 @@ const Forecast = ({ match }) => {
       <div className="d-flex justify-content-between mb-5">
         <div>
           <h1>{weather.name}</h1>
-          <h6>{printDate(time)}</h6>
+          <h6>{formateDate(time)}</h6>
         </div>
         <div>
           <h4>Current weather details:</h4>
@@ -163,40 +160,31 @@ const Forecast = ({ match }) => {
       {/* Chart | Table btn  */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <p className="m-0">Forecast for next 7 days</p>
-        <div className="btn-group btn-group-toggle" data-toggle="buttons">
-          <label className="btn btn-secondary active">
-            <input
-              type="radio"
-              name="options"
-              autoComplete="off"
-              onClick={() => setIsTable(false)}
-            />
-            Chart
-          </label>
 
-          <label className="btn btn-secondary">
-            <input
-              type="radio"
-              name="options"
-              autoComplete="off"
-              checked={true}
-              onClick={() => setIsTable(true)}
-            />
+        <div className="btn-group btn-group-toggle">
+          <button
+            className={`btn btn-secondary ${!isTable && "active"}`}
+            onClick={() => setIsTable(false)}
+          >
+            Chart
+          </button>
+          <button
+            className={`btn btn-secondary ${isTable && "active"}`}
+            onClick={() => setIsTable(true)}
+          >
             Table
-          </label>
+          </button>
         </div>
       </div>
 
-      {/* Chart */}
+      {/* Chart & Table*/}
 
       {isTable ? (
         <Table data={forecast.daily} />
       ) : (
         <div className="card mb-5">
           <div className="card-body">
-            <div className="chart">
-              <Bar data={data1} width={100} height={50} options={options} />
-            </div>
+            <Bar data={chartData} width={100} height={50} options={options} />
           </div>
         </div>
       )}
@@ -207,38 +195,12 @@ const Forecast = ({ match }) => {
         </Link>
       </div>
 
-      {/* Toggle on saved search */}
-      <Switch
-        checked={toggled}
-        handleClick={() => {
-          dispatch({ type: "SEARCH_LIST_TOGGLE" });
-        }}
-        className="mb-3"
-      />
-
       {/* Searched Weather Forcasts  */}
-      {!toggled ? (
-        <div className="text-center border">
-          <h5 className="my-3">Currently not showing search history</h5>
-        </div>
-      ) : (
-        <div className="border rounded p-3 shadow">
-          {weatherList.length === 0 && (
-            <div className="d-flex justify-content-center align-items center">
-              <p className="my-5">There is no previous search.</p>
-            </div>
-          )}
-          <div className="row">
-            {weatherList.slice(0, 3).map((weather) => (
-              <ForecastCard
-                key={weather.data.id}
-                cityName={weather.data.name}
-                date={weather.stringTime}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      <PreviousSearch
+        maxSearch={3}
+        toggled={toggled}
+        searchList={weatherList}
+      />
     </div>
   );
 };
