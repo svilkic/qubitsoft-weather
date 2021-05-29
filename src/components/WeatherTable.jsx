@@ -15,20 +15,18 @@ const days = [
   "sunday",
 ];
 
-const Table = ({ data }) => {
+const WeatherTable = ({ data }) => {
   return (
     <table className="table ">
       <thead>
         <tr>
           <td></td>
-          <td>{days[new Date().getDay() - 1]}</td>
-          <td>{days[new Date().getDay()]}</td>
-          <td>{days[new Date().getDay() + 1]}</td>
-          <td>{days[new Date().getDay() + 2]}</td>
-          <td>{days[new Date().getDay() + 3]}</td>
-          <td>{days[new Date().getDay() + 4]}</td>
-          <td>{days[new Date().getDay() + 5]}</td>
-          <td>{days[new Date().getDay() + 6]}</td>
+          <>
+            <td>{days[new Date().getDay() - 1]}</td>
+            {[0, ...Array(6)].map((x, i) => (
+              <td>{days[new Date().getDay() + i]}</td>
+            ))}
+          </>
         </tr>
       </thead>
       <tbody>
@@ -64,4 +62,4 @@ const Table = ({ data }) => {
   );
 };
 
-export default Table;
+export default WeatherTable;
