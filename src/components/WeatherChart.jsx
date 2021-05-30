@@ -1,22 +1,6 @@
 import React from "react";
 import { Bar } from "react-chartjs-2";
-
-const days = [
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-  "sunday",
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-  "sunday",
-];
+import { days } from "../extras";
 
 const WeatherChart = ({ data }) => {
   let chartData = {
@@ -42,7 +26,7 @@ const WeatherChart = ({ data }) => {
     },
   };
 
-  for (var i = new Date().getDay() - 1; i < new Date().getDay() - 1 + 8; i++) {
+  for (var i = new Date().getDay(); i < new Date().getDay() + 8; i++) {
     chartData.labels.push(days[i]);
   }
 

@@ -1,19 +1,4 @@
-const days = [
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-  "sunday",
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-  "sunday",
-];
+import { days } from "../extras";
 
 const WeatherTable = ({ data }) => {
   return (
@@ -22,9 +7,8 @@ const WeatherTable = ({ data }) => {
         <tr>
           <td></td>
           <>
-            <td>{days[new Date().getDay() - 1]}</td>
-            {[0, ...Array(6)].map((x, i) => (
-              <td>{days[new Date().getDay() + i]}</td>
+            {[0, ...Array(7)].map((x, i) => (
+              <td key={i}>{days[new Date().getDay() + i]}</td>
             ))}
           </>
         </tr>
@@ -33,8 +17,8 @@ const WeatherTable = ({ data }) => {
         <tr>
           <td></td>
           {data &&
-            data.map((day) => (
-              <td>
+            data.map((day, index) => (
+              <td key={index}>
                 <img
                   src={`http://openweathermap.org/img/wn/${day.weather[0].icon}.png`}
                 />
@@ -43,19 +27,23 @@ const WeatherTable = ({ data }) => {
         </tr>
         <tr>
           <td>Min</td>
-          {data && data.map((day) => <td>{day.temp.min}</td>)}
+          {data &&
+            data.map((day, index) => <td key={index}>{day.temp.min}</td>)}
         </tr>
         <tr>
           <td>Max</td>
-          {data && data.map((day) => <td>{day.temp.max}</td>)}
+          {data &&
+            data.map((day, index) => <td key={index}>{day.temp.max}</td>)}
         </tr>
         <tr>
           <td>Wind (km/h)</td>
-          {data && data.map((day) => <td>{day.wind_speed}</td>)}
+          {data &&
+            data.map((day, index) => <td key={index}>{day.wind_speed}</td>)}
         </tr>
         <tr>
           <td>Humidity (%)</td>
-          {data && data.map((day) => <td>{day.humidity}</td>)}
+          {data &&
+            data.map((day, index) => <td key={index}>{day.humidity}</td>)}
         </tr>
       </tbody>
     </table>
